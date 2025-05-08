@@ -1,0 +1,35 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import time
+
+def generate_initial_grid(rows, cols):
+    return np.random.choice([0, 1], size=(rows, cols))
+
+def count_neighbors(grid):
+    # Підрахунок живих сусідів через зсуви
+    return sum(np.roll(np.roll(grid, i, 0), j, 1)
+               for i in (-1, 0, 1) for j in (-1, 0, 1)
+               if not (i == 0 and j == 0))
+
+def update_grid(grid):
+    neighbors = count_neighbors(grid)
+    # Живі клітини з 2 або 3 сусідами виживають, мертві з 3 — оживають
+    return ((grid == 1) & ((neighbors == 2) | (neighbors == 3)) |
+            (grid == 0) & (neighbors == 3)).astype(int)
+
+def display_grid(grid):
+    plt.imshow(grid, cmap='binary')
+    plt.axis('off')
+    plt.show(block=False)
+    plt.pause(0.01)
+    plt.clf()
+
+def run_game_of_life(rows, cols, generations):
+    grid = generate_initial_grid(rows, cols)
+    for _ in range(generations):
+        display_grid(grid)
+        grid = update_grid(grid)
+    plt.close()
+
+if __name__ == "__main__":
+    run_game_of_life(rows=1000, cols=1000, generations=100)
